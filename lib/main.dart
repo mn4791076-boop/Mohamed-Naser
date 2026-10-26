@@ -8,12 +8,12 @@ void main() {
   ));
 }
 
-// 🔐 كود التفعيل السري الذي تبيعه لأصحاب السايبر
+// 🔐 كود التفعيل السري لتطبيقك
 const String masterActivationCode = "CYBER2026VIP"; 
 
 class DeviceModel {
   String name;
-  String type; // "بلايستيشن" أو "بي سي"
+  String type;
   bool isAvailable;
 
   DeviceModel({required this.name, required this.type, this.isAvailable = true});
@@ -21,8 +21,8 @@ class DeviceModel {
 
 class AppData {
   static String shopName = "سايبر الألعاب";
-  static String ownerPhone = "01000000000"; // رقم فودافون كاش
-  static String ownerInstapay = "cyber.owner@instapay"; // حساب إنستا باي
+  static String ownerPhone = "01000000000";
+  static String ownerInstapay = "cyber.owner@instapay";
   static String ownerLoggedInPhone = ""; 
   
   static List<DeviceModel> devices = [
@@ -33,7 +33,7 @@ class AppData {
   static List<String> adminNotifications = [];
 }
 
-// 1. شاشة اختيار البداية
+// 1. شاشة البداية الرئيسية
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
@@ -41,86 +41,55 @@ class RoleSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F1E),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF1E1E2F), Color(0xFF0F0F1E)],
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.sports_esports, size: 60, color: Colors.purpleAccent),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.sports_esports, size: 60, color: Colors.purpleAccent),
+              const SizedBox(height: 20),
+              const Text(
+                "Cyber System التجاري",
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "نظام إدارة السايبر المتقدم",
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+              const SizedBox(height: 40),
+              
+              // زر دخول صاحب السيرفر
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  minimumSize: const Size(double.infinity, 55),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Cyber System التجاري",
-                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  "إدارة ألعاب البلايستيشن والـ PC مع طرق دفع متعددة",
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-                
-                // زر دخول صاحب السيرفر
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
-                    minimumSize: const Size(double.infinity, 55),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  onPressed: () {
-                    _showOwnerAuthDialog(context);
-                  },
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.admin_panel_settings, color: Colors.white),
-                      SizedBox(width: 10),
-                      Text("دخول صاحب السيرفر (إدارة)", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
+                onPressed: () {
+                  _showOwnerAuthDialog(context);
+                },
+                child: const Text("دخول صاحب السيرفر (إدارة)", style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+              const SizedBox(height: 20),
 
-                // زر دخول الزبون
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 55),
-                    side: const BorderSide(color: Colors.purpleAccent, width: 2),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CustomerBookingScreen()),
-                    );
-                  },
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.person_outline, color: Colors.purpleAccent),
-                      SizedBox(width: 10),
-                      Text("دخول الزبون (حجز الأجهزة)", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+              // زر دخول الزبون
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 55),
+                  side: const BorderSide(color: Colors.purpleAccent, width: 2),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-              ],
-            ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CustomerBookingScreen()),
+                  );
+                },
+                child: const Text("دخول الزبون (حجز الأجهزة)", style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+            ],
           ),
         ),
       ),
@@ -129,14 +98,13 @@ class RoleSelectionScreen extends StatelessWidget {
 
   void _showOwnerAuthDialog(BuildContext context) {
     final TextEditingController phoneController = TextEditingController();
-    final TextEditingController activationCodeController = TextEditingController();
+    final TextEditingController codeController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E2F),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text("🔐 تحقق مالك السايبر", style: TextStyle(color: Colors.white, fontSize: 18)),
+        title: const Text("🔐 تحقق مالك السايبر", style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -144,22 +112,14 @@ class RoleSelectionScreen extends StatelessWidget {
               controller: phoneController,
               keyboardType: TextInputType.phone,
               style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: "رقم تليفونك الشخصي",
-                labelStyle: TextStyle(color: Colors.grey),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.purple)),
-              ),
+              decoration: const InputDecoration(labelText: "رقم تليفونك الشخصي", labelStyle: TextStyle(color: Colors.grey)),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
             TextField(
-              controller: activationCodeController,
+              controller: codeController,
               obscureText: true,
               style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: "كود التفعيل الخاص بالبرنامج",
-                labelStyle: TextStyle(color: Colors.grey),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.purple)),
-              ),
+              decoration: const InputDecoration(labelText: "كود التفعيل السري", labelStyle: TextStyle(color: Colors.grey)),
             ),
           ],
         ),
@@ -171,13 +131,7 @@ class RoleSelectionScreen extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
             onPressed: () {
-              if (phoneController.text.length < 10) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("❌ برجاء إدخال رقم تليفون صحيح")),
-                );
-                return;
-              }
-              if (activationCodeController.text == masterActivationCode) {
+              if (codeController.text == masterActivationCode) {
                 AppData.ownerLoggedInPhone = phoneController.text;
                 Navigator.pop(context);
                 Navigator.push(
@@ -187,11 +141,11 @@ class RoleSelectionScreen extends StatelessWidget {
               } else {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("❌ كود التفعيل غير صحيح! تواصل مع المطور.")),
+                  const SnackBar(content: Text("❌ كود التفعيل غير صحيح!")),
                 );
               }
             },
-            child: const Text("تحقق ودخول", style: TextStyle(color: Colors.white)),
+            child: const Text("دخول", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -199,7 +153,7 @@ class RoleSelectionScreen extends StatelessWidget {
   }
 }
 
-// 2. لوحة تحكم صاحب السيرفر
+// 2. لوحة التحكم
 class OwnerDashboardScreen extends StatefulWidget {
   const OwnerDashboardScreen({super.key});
 
@@ -208,9 +162,9 @@ class OwnerDashboardScreen extends StatefulWidget {
 }
 
 class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
-  final TextEditingController shopNameController = TextEditingController(text: AppData.shopName);
-  final TextEditingController phoneController = TextEditingController(text: AppData.ownerPhone);
-  final TextEditingController instapayController = TextEditingController(text: AppData.ownerInstapay);
+  final TextEditingController shopNameCtrl = TextEditingController(text: AppData.shopName);
+  final TextEditingController phoneCtrl = TextEditingController(text: AppData.ownerPhone);
+  final TextEditingController instapayCtrl = TextEditingController(text: AppData.ownerInstapay);
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +172,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
       backgroundColor: const Color(0xFF0F0F1E),
       appBar: AppBar(
         backgroundColor: Colors.purple,
-        title: Text("إدارة: ${AppData.shopName}", style: const TextStyle(color: Colors.white, fontSize: 16)),
+        title: Text("إدارة: ${AppData.shopName}", style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -226,66 +180,46 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E2F),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.purple.withOpacity(0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("⚙️ إعدادات السايبر وحسابات التحصيل", style: TextStyle(color: Colors.purpleAccent, fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: shopNameController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: "اسم السايبر الخاص بك", labelStyle: TextStyle(color: Colors.grey)),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: "رقم فودافون كاش لاستلام الأرباح", labelStyle: TextStyle(color: Colors.grey)),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: instapayController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: "حساب إنستا باي (Instapay ID)", labelStyle: TextStyle(color: Colors.grey)),
-                  ),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, minimumSize: const Size(double.infinity, 45)),
-                    onPressed: () {
-                      setState(() {
-                        AppData.shopName = shopNameController.text;
-                        AppData.ownerPhone = phoneController.text;
-                        AppData.ownerInstapay = instapayController.text;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ تم حفظ إعدادات السايبر بنجاح")));
-                    },
-                    child: const Text("حفظ الإعدادات", style: TextStyle(color: Colors.white)),
-                  ),
-                ],
-              ),
+            TextField(
+              controller: shopNameCtrl,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(labelText: "اسم السايبر", labelStyle: TextStyle(color: Colors.grey)),
+            ),
+            TextField(
+              controller: phoneCtrl,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(labelText: "رقم فودافون كاش", labelStyle: TextStyle(color: Colors.grey)),
+            ),
+            TextField(
+              controller: instapayCtrl,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(labelText: "حساب إنستا باي", labelStyle: TextStyle(color: Colors.grey)),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+              onPressed: () {
+                setState(() {
+                  AppData.shopName = shopNameCtrl.text;
+                  AppData.ownerPhone = phoneCtrl.text;
+                  AppData.ownerInstapay = instapayCtrl.text;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ تم الحفظ")));
+              },
+              child: const Text("حفظ الإعدادات", style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 20),
-            const Text("🔔 تنبيهات الحجوزات وإيصالات الدفع", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text("🔔 التنبيهات وإيصالات الحجز:", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Container(
-              height: 120,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: const Color(0xFF1E1E2F), borderRadius: BorderRadius.circular(16)),
+              height: 100,
+              decoration: BoxDecoration(color: const Color(0xFF1E1E2F), borderRadius: BorderRadius.circular(12)),
               child: AppData.adminNotifications.isEmpty
-                  ? const Center(child: Text("لا توجد تنبيهات أو إيصالات جديدة", style: TextStyle(color: Colors.grey)))
+                  ? const Center(child: Text("لا توجد تنبيهات جديدة", style: TextStyle(color: Colors.grey)))
                   : ListView.builder(
                       itemCount: AppData.adminNotifications.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          leading: const Icon(Icons.receipt_long, color: Colors.greenAccent),
                           title: Text(AppData.adminNotifications[index], style: const TextStyle(color: Colors.white, fontSize: 13)),
                         );
                       },
@@ -295,48 +229,28 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.between,
               children: [
-                const Text("🎮 أجهزتك (بلايستيشن / بي سي):", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                ElevatedButton.icon(
+                const Text("🎮 الأجهزة:", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-                  onPressed: () => _showAddDeviceDialog(),
-                  icon: const Icon(Icons.add, color: Colors.white),
-                  label: const Text("إضافة جهاز", style: TextStyle(color: Colors.white)),
+                  onPressed: () => _addDeviceDialog(),
+                  child: const Text("إضافة جهاز", style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: AppData.devices.length,
               itemBuilder: (context, index) {
-                final device = AppData.devices[index];
+                final dev = AppData.devices[index];
                 return Card(
                   color: const Color(0xFF1E1E2F),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: ListTile(
-                    leading: Icon(
-                      device.type == "بلايستيشن" ? Icons.sports_esports : Icons.computer,
-                      color: device.isAvailable ? Colors.greenAccent : Colors.redAccent,
-                    ),
-                    title: Text(device.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    subtitle: Text("النوع: ${device.type}", style: const TextStyle(color: Colors.grey)),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          device.isAvailable ? "متاح 🟢" : "مشغول 🔴",
-                          style: TextStyle(color: device.isAvailable ? Colors.greenAccent : Colors.redAccent, fontWeight: FontWeight.bold),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.grey),
-                          onPressed: () {
-                            setState(() {
-                              AppData.devices.removeAt(index);
-                            });
-                          },
-                        ),
-                      ],
+                    title: Text(dev.name, style: const TextStyle(color: Colors.white)),
+                    subtitle: Text(dev.type, style: const TextStyle(color: Colors.grey)),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.redAccent),
+                      onPressed: () => setState(() => AppData.devices.removeAt(index)),
                     ),
                   ),
                 );
@@ -348,54 +262,37 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
     );
   }
 
-  void _showAddDeviceDialog() {
-    final TextEditingController nameController = TextEditingController();
+  void _addDeviceDialog() {
+    final TextEditingController nameCtrl = TextEditingController();
     String type = "بلايستيشن";
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E2F),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text("إضافة جهاز جديد", style: TextStyle(color: Colors.white)),
+        title: const Text("إضافة جهاز", style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: nameController,
+              controller: nameCtrl,
               style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                hintText: "اسم الجهاز (مثل: PS 3 أو PC 2)",
-                hintStyle: TextStyle(color: Colors.grey),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.purple)),
-              ),
+              decoration: const InputDecoration(hintText: "اسم الجهاز", hintStyle: TextStyle(color: Colors.grey)),
             ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
+            DropdownButton<String>(
               value: type,
               dropdownColor: const Color(0xFF1E1E2F),
               style: const TextStyle(color: Colors.white),
-              items: ["بلايستيشن", "بي سي"].map((String value) {
-                return DropdownMenuItem<String>(value: value, child: Text(value));
-              }).toList(),
-              onChanged: (val) {
-                type = val!;
-              },
+              items: ["بلايستيشن", "بي سي"].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+              onChanged: (val) => type = val!,
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("إلغاء", style: TextStyle(color: Colors.grey)),
-          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
             onPressed: () {
-              if (nameController.text.isNotEmpty) {
-                setState(() {
-                  AppData.devices.add(DeviceModel(name: nameController.text, type: type, isAvailable: true));
-                });
+              if (nameCtrl.text.isNotEmpty) {
+                setState(() => AppData.devices.add(DeviceModel(name: nameCtrl.text, type: type)));
                 Navigator.pop(context);
               }
             },
@@ -407,7 +304,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
   }
 }
 
-// 3. شاشة حجز الزبون
+// 3. حجز الزبون
 class CustomerBookingScreen extends StatefulWidget {
   const CustomerBookingScreen({super.key});
 
@@ -417,9 +314,9 @@ class CustomerBookingScreen extends StatefulWidget {
 
 class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
   DeviceModel? selectedDevice;
-  double selectedHours = 1;
-  String selectedPayment = "نقدي (كاش في المحل)";
-  bool hasAttachedReceipt = false;
+  double hours = 1;
+  String payment = "نقدي (كاش)";
+  bool receiptAttached = false;
 
   @override
   Widget build(BuildContext context) {
@@ -435,186 +332,73 @@ class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("🎮 اختر جهازاً للحجز:", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            const Text("اختر الجهاز:", style: TextStyle(color: Colors.white, fontSize: 16)),
             SizedBox(
-              height: 180,
+              height: 150,
               child: ListView.builder(
                 itemCount: AppData.devices.length,
                 itemBuilder: (context, index) {
-                  final device = AppData.devices[index];
-                  bool isSelected = selectedDevice == device;
+                  final dev = AppData.devices[index];
                   return Card(
-                    color: isSelected ? Colors.purple.withOpacity(0.4) : const Color(0xFF1E1E2F),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    color: selectedDevice == dev ? Colors.purple.withOpacity(0.5) : const Color(0xFF1E1E2F),
                     child: ListTile(
-                      leading: Icon(
-                        device.type == "بلايستيشن" ? Icons.sports_esports : Icons.computer,
-                        color: device.isAvailable ? Colors.greenAccent : Colors.redAccent,
-                      ),
-                      title: Text(device.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      subtitle: Text("النوع: ${device.type}", style: const TextStyle(color: Colors.grey)),
-                      trailing: Text(
-                        device.isAvailable ? "متاح 🟢" : "مشغول 🔴",
-                        style: TextStyle(color: device.isAvailable ? Colors.greenAccent : Colors.redAccent, fontWeight: FontWeight.bold),
-                      ),
-                      onTap: device.isAvailable
-                          ? () {
-                              setState(() {
-                                selectedDevice = device;
-                              });
-                            }
-                          : null,
+                      title: Text(dev.name, style: const TextStyle(color: Colors.white)),
+                      subtitle: Text(dev.isAvailable ? "متاح 🟢" : "مشغول 🔴", style: TextStyle(color: dev.isAvailable ? Colors.green : Colors.red)),
+                      onTap: dev.isAvailable ? () => setState(() => selectedDevice = dev) : null,
                     ),
                   );
                 },
               ),
             ),
-            const SizedBox(height: 20),
-            const Text("⏳ حدد عدد الساعات المطلوبة:", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Text("الساعات: ${hours.toInt()}", style: const TextStyle(color: Colors.white)),
             Slider(
-              value: selectedHours,
+              value: hours,
               min: 1,
               max: 10,
               divisions: 9,
               activeColor: Colors.purple,
-              inactiveColor: Colors.grey,
-              label: "${selectedHours.toInt()} ساعات",
-              onChanged: (double value) {
-                setState(() {
-                  selectedHours = value;
-                });
-              },
+              onChanged: (val) => setState(() => hours = val),
             ),
-            Center(
-              child: Text(
-                "عدد الساعات: ${selectedHours.toInt()} ساعات",
-                style: const TextStyle(color: Colors.purpleAccent, fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text("💳 اختر طريقة الدفع:", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
             DropdownButtonFormField<String>(
-              value: selectedPayment,
+              value: payment,
               dropdownColor: const Color(0xFF1E1E2F),
               style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFF1E1E2F),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
               items: [
-                "نقدي (كاش في المحل)",
+                "نقدي (كاش)",
                 "فودافون كاش (${AppData.ownerPhone})",
-                "إنستا باي Instapay (${AppData.ownerInstapay})"
-              ].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedPayment = newValue!;
-                });
-              },
+                "إنستا باي (${AppData.ownerInstapay})"
+              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+              onChanged: (val) => setState(() => payment = val!),
             ),
-            
-            if (!selectedPayment.contains("نقدي")) ...[
-              const SizedBox(height: 15),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.purpleAccent),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      selectedPayment.contains("فودافون")
-                          ? "قم بالتحويل على رقم: ${AppData.ownerPhone}"
-                          : "قم بالتحويل على حساب إنستا باي: ${AppData.ownerInstapay}",
-                      style: const TextStyle(color: Colors.orangeAccent, fontSize: 13, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: hasAttachedReceipt ? Colors.green : Colors.deepPurple,
-                        minimumSize: const Size(double.infinity, 45),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          hasAttachedReceipt = true;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("📸 تم التقاط وإرفاق إيصال التحويل بنجاح!")),
-                        );
-                      },
-                      icon: Icon(hasAttachedReceipt ? Icons.check_circle : Icons.camera_alt),
-                      label: Text(
-                        hasAttachedReceipt ? "تم إرفاق إيصال التحويل (معتمد 📷)" : "تصوير / رفع إيصال التحويل 📸",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
+            if (!payment.contains("نقدي")) ...[
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(backgroundColor: receiptAttached ? Colors.green : Colors.deepPurple),
+                onPressed: () {
+                  setState(() => receiptAttached = true);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("📸 تم إرفاق الإيصال بنجاح!")));
+                },
+                icon: Icon(receiptAttached ? Icons.check : Icons.camera_alt),
+                label: Text(receiptAttached ? "تم إرفاق الإيصال" : "تصوير / رفع إيصال التحويل"),
               ),
             ],
-
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
-                minimumSize: const Size(double.infinity, 55),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                minimumSize: const Size(double.infinity, 50),
               ),
-              onPressed: selectedDevice == null
-                  ? null
-                  : () {
-                      if (!selectedPayment.contains("نقدي") && !hasAttachedReceipt) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("⚠️ برجاء تصوير أو إرفاق إيصال التحويل أولاً ليتمكن صاحب السايبر من مراجعته!")),
-                        );
-                        return;
-                      }
-
-                      setState(() {
-                        selectedDevice!.isAvailable = false;
-                      });
-
-                      String receiptStatus = hasAttachedReceipt ? "مع إيصال مرفق 📸" : "بدون إيصال (كاش)";
-                      AppData.adminNotifications.insert(
-                        0,
-                        "حجز جديد: (${selectedDevice!.name}) لمدة ${selectedHours.toInt()} ساعات | الدفع: $selectedPayment ($receiptStatus)",
-                      );
-
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          backgroundColor: const Color(0xFF1E1E2F),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          title: const Text("🎉 تم الحجز بنجاح!", style: TextStyle(color: Colors.white)),
-                          content: Text(
-                            "تم حجز ${selectedDevice!.name}\nالمدة: ${selectedHours.toInt()} ساعات\nطريقة الدفع: $selectedPayment\nالحالة: ${hasAttachedReceipt ? 'تم إرسال إيصال التحويل لصاحب السايبر 📸' : 'الدفع كاش في المحل'}",
-                            style: const TextStyle(color: Colors.grey, fontSize: 14),
-                          ),
-                          actions: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                              child: const Text("حسناً", style: TextStyle(color: Colors.white)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-              child: const Text("تأكيد وحجز الجهاز الآن", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              onPressed: selectedDevice == null ? null : () {
+                if (!payment.contains("نقدي") && !receiptAttached) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("⚠️ برجاء إرفاق الإيصال أولاً")));
+                  return;
+                }
+                setState(() => selectedDevice!.isAvailable = false);
+                AppData.adminNotifications.insert(0, "حجز: ${selectedDevice!.name} لمدة ${hours.toInt()} ساعات ($payment)");
+                Navigator.pop(context);
+              },
+              child: const Text("تأكيد الحجز", style: TextStyle(color: Colors.white, fontSize: 16)),
             ),
           ],
         ),

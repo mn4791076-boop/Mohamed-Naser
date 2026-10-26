@@ -407,7 +407,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
   }
 }
 
-// 3. شاشة حجز الزبون مع طرق الدفع وإرفاق الإيصال
+// 3. شاشة حجز الزبون
 class CustomerBookingScreen extends StatefulWidget {
   const CustomerBookingScreen({super.key});
 
@@ -419,7 +419,7 @@ class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
   DeviceModel? selectedDevice;
   double selectedHours = 1;
   String selectedPayment = "نقدي (كاش في المحل)";
-  bool hasAttachedReceipt = false; // مؤشر لتصوير/إرفاق رسالة التحويل
+  bool hasAttachedReceipt = false;
 
   @override
   Widget build(BuildContext context) {
@@ -521,7 +521,6 @@ class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
               },
             ),
             
-            // إرشادات وزر تصوير وإرفاق رسالة التحويل إذا تم اختيار فودافون كاش أو إنستا باي
             if (!selectedPayment.contains("نقدي")) ...[
               const SizedBox(height: 15),
               Container(
@@ -547,7 +546,6 @@ class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
                         minimumSize: const Size(double.infinity, 45),
                       ),
                       onPressed: () {
-                        // محاكاة تصوير أو رفع سكرين شوت رسالة التحويل
                         setState(() {
                           hasAttachedReceipt = true;
                         });
@@ -576,7 +574,6 @@ class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
               onPressed: selectedDevice == null
                   ? null
                   : () {
-                      // شرط التحقق من الإيصال إذا كان الدفع إلكترونياً
                       if (!selectedPayment.contains("نقدي") && !hasAttachedReceipt) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("⚠️ برجاء تصوير أو إرفاق إيصال التحويل أولاً ليتمكن صاحب السايبر من مراجعته!")),
@@ -588,7 +585,6 @@ class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
                         selectedDevice!.isAvailable = false;
                       });
 
-                      // إرسال تنبيه لصاحب السيرفر مع حالة الإيصال
                       String receiptStatus = hasAttachedReceipt ? "مع إيصال مرفق 📸" : "بدون إيصال (كاش)";
                       AppData.adminNotifications.insert(
                         0,

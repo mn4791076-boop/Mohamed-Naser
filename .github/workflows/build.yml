@@ -1,4 +1,4 @@
-name: Generate Android Platform
+name: Build Flutter APK
 
 on:
   workflow_dispatch:
@@ -6,17 +6,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.x'
           channel: 'stable'
-      - name: Create Android files
-        run: flutter create . --platforms=android
-      - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Get dependencies
+        run: flutter pub get
+      - name: Build APK
+        run: flutter build apk --release
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
         with:
-          commit_message: "Auto-generate missing android files"
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk

@@ -9,12 +9,8 @@ void main() {
   ));
 }
 
-// ==========================================
-// 🔑 الكود السري الخاص بك لتشغيل لوحة التحكم
-// ==========================================
-const String ownerSecretKey = "mohamed202601281371307"; 
+const String ownerSecretKey = "mohamed202601281371307";
 
-// 1. شاشة البداية: اختيار (صاحب سيبر) أو (زبون)
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
@@ -28,24 +24,38 @@ class RoleSelectionScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("🎮 Cyber System 🎮", style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+              const Text(
+                "🎮 Cyber System 🎮", 
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
-              const Text("اختر طريقة الدخول لتشغيل النظام", style: TextStyle(color: Colors.grey, fontSize: 14)),
+              const Text(
+                "اختر طريقة الدخول للنظام", 
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
               const SizedBox(height: 40),
-              
-              // زر دخول صاحب السيبر (محمي بكود)
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple,
                   minimumSize: const Size(double.infinity, 55),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const OwnerCheckScreen()));
-                },
+                onPressed: () {},
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.admin_panel_settings, color: Colors.white),
                     SizedBox(width: 10),
-                    Text("دخول
+                    Text("دخول", style: TextStyle(color: Colors.white, fontSize: 16)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

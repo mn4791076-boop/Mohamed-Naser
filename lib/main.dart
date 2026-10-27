@@ -4,17 +4,109 @@ void main() {
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     title: 'Cyber System',
-    home: RoleSelectionScreen(),
+    localizationsDelegates: [
+      DefaultMaterialLocalizations.delegate,
+      DefaultWidgetsLocalizations.delegate,
+    ],
+    supportedLocales: [
+      Locale('ar', 'AE'), 
+    ],
+    locale: Locale('ar', 'AE'),
+    home: ActivationScreen(),
   ));
 }
 
 // 🔐 كود التفعيل التجاري الخاص بك
-const String masterActivationCode = "Mohamed 200901281371307";
+const String masterActivationCode = 'Mohamed 200901281371307';
+
+// شاشة التفعيل والتحقق من الرخصة التجارية قبل تشغيل التطبيق
+class ActivationScreen extends StatefulWidget {
+  const ActivationScreen({super.key});
+
+  @override
+  State<ActivationScreen> createState() => _ActivationScreenState();
+}
+
+class _ActivationScreenState extends State<ActivationScreen> {
+  final _codeController = TextEditingController();
+
+  void _verifyActivationCode() {
+    if (_codeController.text.trim() == masterActivationCode) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم تفعيل النسخة التجارية بنجاح!'), backgroundColor: Colors.green),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('كود التفعيل غير صحيح! يرجى التواصل مع المطور.'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Card(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.lock_outline, size: 80, color: Colors.amber),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'تفعيل النسخة التجارية',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'برجاء إدخال كود التفعيل الممنوح لك من المطور لتشغيل نظام السايبر.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: _codeController,
+                    decoration: const InputDecoration(
+                      labelText: 'كود التفعيل الخاص بك',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.vpn_key),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 50),
+                      backgroundColor: Colors.amber[700],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: _verifyActivationCode,
+                    child: const Text('تفعيل التطبيق الآن', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 // نموذج بيانات الجهاز
 class DeviceModel {
   String name;
-  String type; // "بلايستيشن" أو "بي سي"
+  String type; // بلايستيشن أو بي سي
   bool isAvailable;
   String? currentCustomer;
 
@@ -53,7 +145,7 @@ class BookingNotification {
   String customerName;
   String customerSenderInfo; // رقم التليفون أو حساب إنستا باي للزبون
   String deviceName;
-  String paymentMethod; // "نقدي (كاش)", "فودافون كاش", "إنستا باي"
+  String paymentMethod; // نقدي (كاش) , فودافون كاش , إنستا باي
   double amount;
   bool isPaid;
 
@@ -71,265 +163,76 @@ class BookingNotification {
 class AppData {
   static List<ShopAccount> registeredShops = [
     ShopAccount(
-      phone: "01000000000",
-      password: "123",
-      shopName: "سايبر الألعاب المركزي",
-      instapay: "cyber.central@instapay",
-      vodafoneCash: "01000000000",
+      phone: '01000000000',
+      password: '123',
+      shopName: 'سايبر الألعاب المركزي',
+      instapay: 'cyber.central@instapay',
+      vodafoneCash: '01000000000',
       devices: [
-        DeviceModel(name: "PlayStation 5 - 1", type: "بلايستيشن", isAvailable: true),
-        DeviceModel(name: "PC Gaming 1", type: "بي سي", isAvailable: true),
+        DeviceModel(name: 'PlayStation 5 - 1', type: 'بلايستيشن', isAvailable: true),
+        DeviceModel(name: 'PC Gaming 1', type: 'بي سي', isAvailable: true),
+        DeviceModel(name: 'PlayStation 5 - 2', type: 'بلايستيشن', isAvailable: false, currentCustomer: 'أحمد'),
       ],
       notifications: [],
     )
   ];
-
   static ShopAccount? currentOwnerShop;
 }
 
-// 1. شاشة اختيار البداية
+// 1. شاشة اختيار تحديد الهوية (صاحب سايبر أم زبون)
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1E),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF1E1E2F), Color(0xFF0F0F1E)],
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.sports_esports, size: 60, color: Colors.purpleAccent),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Cyber System الاحترافي",
-                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  "إدارة شاملة لمحلات الألعاب والبلايستيشن والـ PC",
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-                
-                // زر دخول / تسجيل صاحب السايبر
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
-                    minimumSize: const Size(double.infinity, 55),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  onPressed: () => _showOwnerAuthModal(context),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.admin_panel_settings, color: Colors.white),
-                      SizedBox(width: 10),
-                      Text("دخول / تسجيل صاحب السايبر", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // زر دخول الزبون للحجز
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 55),
-                    side: const BorderSide(color: Colors.purpleAccent, width: 2),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  onPressed: () => _showCustomerSelectShopDialog(context),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.person_outline, color: Colors.purpleAccent),
-                      SizedBox(width: 10),
-                      Text("دخول الزبون (حجز الأجهزة)", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      appBar: AppBar(
+        title: const Text('نظام السايبر الذكي', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
       ),
-    );
-  }
-
-  void _showOwnerAuthModal(BuildContext context) {
-    final TextEditingController phoneController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    final TextEditingController shopNameController = TextEditingController();
-    final TextEditingController activationController = TextEditingController();
-    bool isRegistering = false;
-
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setStateModal) => AlertDialog(
-          backgroundColor: const Color(0xFF1E1E2F),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(
-            isRegistering ? "🔑 تفعيل وإنشاء حساب سايبر جديد" : "🔐 تسجيل دخول صاحب السايبر",
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (isRegistering) ...[
-                  TextField(
-                    controller: shopNameController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: "اسم السايبر", labelStyle: TextStyle(color: Colors.grey)),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: activationController,
-                    style: const TextStyle(color: Colors.greenAccent),
-                    decoration: const InputDecoration(labelText: "كود التفعيل التجاري", labelStyle: TextStyle(color: Colors.grey)),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-                TextField(
-                  controller: phoneController,
-                  keyboardType: TextInputType.phone,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(labelText: "رقم التليفون", labelStyle: TextStyle(color: Colors.grey)),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.sports_esports, size: 100, color: Colors.deepPurple),
+              const SizedBox(height: 40),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 60),
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(labelText: "كلمة السر", labelStyle: TextStyle(color: Colors.grey)),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const OwnerLoginScreen()));
+                },
+                icon: const Icon(Icons.admin_panel_settings),
+                label: const Text('الدخول كصاحب سايبر', style: TextStyle(fontSize: 18)),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 60),
+                  backgroundColor: Colors.blueGrey,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                const SizedBox(height: 15),
-                TextButton(
-                  onPressed: () => setStateModal(() => isRegistering = !isRegistering),
-                  child: Text(
-                    isRegistering ? "لديك حساب؟ سجل دخول" : "مشترٍ جديد؟ فعّل حسابك الآن",
-                    style: const TextStyle(color: Colors.purpleAccent, fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("إلغاء", style: TextStyle(color: Colors.grey)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-              onPressed: () {
-                String phone = phoneController.text.trim();
-                String pass = passwordController.text.trim();
-
-                if (phone.isEmpty || pass.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ برجاء إدخال البيانات كاملة")));
-                  return;
-                }
-
-                if (isRegistering) {
-                  String shopName = shopNameController.text.trim();
-                  String actCode = activationController.text.trim();
-
-                  if (shopName.isEmpty || actCode.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ برجاء إدخال اسم السايبر وكود التفعيل")));
-                    return;
-                  }
-
-                  if (actCode != masterActivationCode) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ كود التفعيل غير صحيح!")));
-                    return;
-                  }
-
-                  if (AppData.registeredShops.any((s) => s.phone == phone)) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("⚠️ هذا الرقم مسجل مسبقاً")));
-                    return;
-                  }
-
-                  ShopAccount newShop = ShopAccount(
-                    phone: phone,
-                    password: pass,
-                    shopName: shopName,
-                    instapay: "$phone@instapay",
-                    vodafoneCash: phone,
-                    devices: [
-                      DeviceModel(name: "PlayStation - 1", type: "بلايستيشن", isAvailable: true),
-                    ],
-                    notifications: [],
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CustomerBookingScreen(shop: AppData.registeredShops.first),
+                    ),
                   );
-                  AppData.registeredShops.add(newShop);
-                  AppData.currentOwnerShop = newShop;
-                  Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const OwnerDashboardScreen()));
-                } else {
-                  try {
-                    ShopAccount found = AppData.registeredShops.firstWhere((s) => s.phone == phone && s.password == pass);
-                    AppData.currentOwnerShop = found;
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const OwnerDashboardScreen()));
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ بيانات الدخول غير صحيحة")));
-                  }
-                }
-              },
-              child: Text(isRegistering ? "تفعيل وحفظ" : "دخول", style: const TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showCustomerSelectShopDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2F),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text("🏪 اختر السايبر للحجز", style: TextStyle(color: Colors.white)),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: AppData.registeredShops.length,
-            itemBuilder: (context, index) {
-              ShopAccount shop = AppData.registeredShops[index];
-              return Card(
-                color: const Color(0xFF2E2E42),
-                child: ListTile(
-                  title: Text(shop.shopName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text("الهاتف: ${shop.phone}", style: const TextStyle(color: Colors.grey)),
-                  trailing: const Icon(Icons.arrow_forward_ios, color: Colors.purpleAccent, size: 16),
-                  onTap: () {
-                    AppData.currentOwnerShop = shop;
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerBookingScreen()));
-                  },
-                ),
-              );
-            },
+                },
+                icon: const Icon(Icons.person),
+                label: const Text('الدخول كزبون (حجز جهاز)', style: TextStyle(fontSize: 18)),
+              ),
+            ],
           ),
         ),
       ),
@@ -337,7 +240,72 @@ class RoleSelectionScreen extends StatelessWidget {
   }
 }
 
-// 2. لوحة تحكم صاحب السايبر
+// 2. شاشة تسجيل دخول صاحب السايبر
+class OwnerLoginScreen extends StatefulWidget {
+  const OwnerLoginScreen({super.key});
+
+  @override
+  State<OwnerLoginScreen> createState() => _OwnerLoginScreenState();
+}
+
+class _OwnerLoginScreenState extends State<OwnerLoginScreen> {
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  void _login() {
+    final shop = AppData.registeredShops.firstWhere(
+      (element) => element.phone == _phoneController.text && element.password == _passwordController.text,
+      orElse: () => ShopAccount(phone: '', password: '', shopName: '', instapay: '', vodafoneCash: '', devices: [], notifications: []),
+    );
+
+    if (shop.phone.isNotEmpty) {
+      AppData.currentOwnerShop = shop;
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OwnerDashboardScreen()));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('بيانات الدخول غير صحيحة')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('دخول الإدارة'), backgroundColor: Colors.deepPurple, foregroundColor: Colors.white),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _phoneController,
+              decoration: const InputDecoration(labelText: 'رقم الهاتف', border: OutlineInputBorder()),
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(labelText: 'كلمة المرور', border: OutlineInputBorder()),
+              obscureText: true,
+            ),
+            const SizedBox(height: 25),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: _login,
+              child: const Text('تسجيل الدخول'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 3. لوحة تحكم صاحب السايبر (الأجهزة والإشعارات)
 class OwnerDashboardScreen extends StatefulWidget {
   const OwnerDashboardScreen({super.key});
 
@@ -346,369 +314,279 @@ class OwnerDashboardScreen extends StatefulWidget {
 }
 
 class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
-  late ShopAccount owner = AppData.currentOwnerShop!;
-  late TextEditingController shopNameController = TextEditingController(text: owner.shopName);
-  late TextEditingController phoneController = TextEditingController(text: owner.vodafoneCash);
-  late TextEditingController instapayController = TextEditingController(text: owner.instapay);
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1E),
-      appBar: AppBar(
-        backgroundColor: Colors.purple,
-        title: Text("لوحة تحكم: ${owner.shopName}", style: const TextStyle(color: Colors.white, fontSize: 16)),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final shop = AppData.currentOwnerShop!;
+
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(shop.shopName),
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                _showAddDeviceDialog(context);
+              },
+              tooltip: 'إضافة جهاز جديد',
+            )
+          ],
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.devices), text: 'الأجهزة'),
+              Tab(icon: Icon(Icons.notifications), text: 'طلبات الحجز'),
+            ],
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+          ),
+        ),
+        body: TabBarView(
           children: [
-            // إعدادات السايبر
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E2F),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.purple.withOpacity(0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("⚙️ إعدادات السايبر وطرق التحصيل", style: TextStyle(color: Colors.purpleAccent, fontSize: 15, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  TextField(controller: shopNameController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "اسم السايبر")),
-                  TextField(controller: phoneController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "فودافون كاش")),
-                  TextField(controller: instapayController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "إنستا باي")),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, minimumSize: const Size(double.infinity, 42)),
-                    onPressed: () {
-                      setState(() {
-                        owner.shopName = shopNameController.text;
-                        owner.vodafoneCash = phoneController.text;
-                        owner.instapay = instapayController.text;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ تم حفظ الإعدادات بنجاح")));
-                    },
-                    child: const Text("حفظ الإعدادات", style: TextStyle(color: Colors.white)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            // إشعارات الحجوزات وتأكيد الدفع
-            const Text("🔔 الحجوزات والمدفوعات الواردة", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Container(
-              height: 180,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: const Color(0xFF1E1E2F), borderRadius: BorderRadius.circular(16)),
-              child: owner.notifications.isEmpty
-                  ? const Center(child: Text("لا توجد حجوزات جديدة", style: TextStyle(color: Colors.grey)))
-                  : ListView.builder(
-                      itemCount: owner.notifications.length,
-                      itemBuilder: (context, index) {
-                        final notif = owner.notifications[index];
-                        return Card(
-                          color: const Color(0xFF2E2E42),
-                          child: ListTile(
-                            title: Text("${notif.customerName} - ${notif.deviceName}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("الطريقة: ${notif.paymentMethod} | القيمة: ${notif.amount} ج.م", style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                                Text("رقم/حساب التحويل: ${notif.customerSenderInfo}", style: const TextStyle(color: Colors.greenAccent, fontSize: 11, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            trailing: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: notif.isPaid ? Colors.green : Colors.orange,
-                                minimumSize: const Size(70, 30),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  notif.isPaid = true;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ تم تأكيد الدفع بنجاح")));
-                              },
-                              child: Text(notif.isPaid ? "تم الدفع" : "تأكيد الدفع", style: const TextStyle(color: Colors.white, fontSize: 11)),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-            const SizedBox(height: 20),
-            // إدارة الأجهزة
-            Row(
-              mainAxisAlignment: MainAxisAlignment.between,
-              children: [
-                const Text("🎮 أجهزة السايبر:", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-                  onPressed: () => _showAddDeviceDialog(),
-                  icon: const Icon(Icons.add, color: Colors.white, size: 18),
-                  label: const Text("إضافة جهاز", style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
             ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: owner.devices.length,
+              itemCount: shop.devices.length,
               itemBuilder: (context, index) {
-                final device = owner.devices[index];
+                final device = shop.devices[index];
                 return Card(
-                  color: const Color(0xFF1E1E2F),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  margin: const EdgeInsets.all(10),
                   child: ListTile(
-                    leading: Icon(
-                      device.type == "بلايستيشن" ? Icons.sports_esports : Icons.computer,
-                      color: device.isAvailable ? Colors.greenAccent : Colors.redAccent,
-                    ),
-                    title: Text(device.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    subtitle: Text(
-                      device.isAvailable ? "متاح للحجز ✅ (${device.type})" : "مشغول الآن بـ (${device.currentCustomer ?? 'زبون'}) [${device.type}]",
-                      style: TextStyle(color: device.isAvailable ? Colors.greenAccent : Colors.orangeAccent),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (!device.isAvailable)
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                device.isAvailable = true;
-                                device.currentCustomer = null;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("🔄 تم تفريغ الجهاز وأصبح متاحاً تلقائياً")));
-                            },
-                            child: const Text("تفريغ", style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
-                          ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.redAccent),
-                          onPressed: () {
-                            setState(() {
-                              owner.devices.removeAt(index);
-                            });
-                          },
-                        ),
-                      ],
+                    leading: Icon(device.type == 'بي سي' ? Icons.computer : Icons.gamepad, color: Colors.deepPurple),
+                    title: Text(device.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text(device.isAvailable ? 'متاح حالياً' : 'مشغول مع: ${device.currentCustomer}'),
+                    trailing: Switch(
+                      value: device.isAvailable,
+                      onChanged: (val) {
+                        setState(() {
+                          device.isAvailable = val;
+                          if (val) device.currentCustomer = null;
+                        });
+                      },
                     ),
                   ),
                 );
               },
             ),
+            shop.notifications.isEmpty
+                ? const Center(child: Text('لا توجد طلبات حجز حالياً'))
+                : ListView.builder(
+                    itemCount: shop.notifications.length,
+                    itemBuilder: (context, index) {
+                      final notif = shop.notifications[index];
+                      return Card(
+                        color: notif.isPaid ? Colors.green.shade50 : Colors.orange.shade50,
+                        margin: const EdgeInsets.all(10),
+                        child: ListTile(
+                          title: Text('طلب من: ${notif.customerName}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text('حجز: ${notif.deviceName}\nطريقة الدفع: ${notif.paymentMethod} (${notif.amount} ج.م)\nمرسل من: ${notif.customerSenderInfo}'),
+                          isThreeLine: true,
+                          trailing: notif.isPaid
+                              ? const Chip(label: Text('تم الدفع', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green)
+                              : ElevatedButton(
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple, foregroundColor: Colors.white),
+                                  onPressed: () {
+                                    setState(() {
+                                      notif.isPaid = true;
+                                      final device = shop.devices.firstWhere((d) => d.name == notif.deviceName);
+                                      device.isAvailable = false;
+                                      device.currentCustomer = notif.customerName;
+                                    });
+                                  },
+                                  child: const Text('تأكيد الدفع'),
+                                ),
+                        ),
+                      );
+                    },
+                  ),
           ],
         ),
       ),
     );
   }
 
-  void _showAddDeviceDialog() {
-    final TextEditingController nameController = TextEditingController();
-    String type = "بلايستيشن";
+  void _showAddDeviceDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    String type = 'بلايستيشن';
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setStateModal) => AlertDialog(
-          backgroundColor: const Color(0xFF1E1E2F),
-          title: const Text("➕ إضافة جهاز جديد", style: TextStyle(color: Colors.white)),
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('إضافة جهاز جديد'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nameController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "اسم الجهاز (مثال: PS5 - 2 أو PC - 2)")),
-              const SizedBox(height: 10),
-              DropdownButton<String>(
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'اسم الجهاز (مثال: PS5 - 3)'),
+              ),
+              const SizedBox(height: 15),
+              DropdownButtonFormField<String>(
                 value: type,
-                dropdownColor: const Color(0xFF2E2E42),
-                style: const TextStyle(color: Colors.white),
                 items: const [
-                  DropdownMenuItem(value: "بلايستيشن", child: Text("بلايستيشن")),
-                  DropdownMenuItem(value: "بي سي", child: Text("بي سي (PC)")),
+                  DropdownMenuItem(value: 'بلايستيشن', child: Text('بلايستيشن')),
+                  DropdownMenuItem(value: 'بي سي', child: Text('بي سي')),
                 ],
-                onChanged: (val) => setStateModal(() => type = val!),
+                onChanged: (val) {
+                  if (val != null) type = val;
+                },
+                decoration: const InputDecoration(labelText: 'نوع الجهاز'),
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("إلغاء", style: TextStyle(color: Colors.grey))),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
               onPressed: () {
                 if (nameController.text.isNotEmpty) {
                   setState(() {
-                    owner.devices.add(DeviceModel(name: nameController.text.trim(), type: type, isAvailable: true));
+                    AppData.registeredShops.first.devices.add(
+                      DeviceModel(name: nameController.text, type: type, isAvailable: true),
+                    );
                   });
                   Navigator.pop(context);
                 }
               },
-              child: const Text("إضافة", style: TextStyle(color: Colors.white)),
+              child: const Text('إضافة'),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-// 3. شاشة حجز الزبون
+// 4. شاشة حجز الزبون للجهاز والدفع
 class CustomerBookingScreen extends StatefulWidget {
-  const CustomerBookingScreen({super.key});
+  final ShopAccount shop;
+  const CustomerBookingScreen({super.key, required this.shop});
 
   @override
   State<CustomerBookingScreen> createState() => _CustomerBookingScreenState();
 }
 
 class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
-  final ShopAccount shop = AppData.currentOwnerShop!;
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController senderInfoController = TextEditingController();
   DeviceModel? selectedDevice;
-  String paymentMethod = "نقدي (كاش)";
-  double pricePerHour = 40.0;
+  final nameController = TextEditingController();
+  final senderInfoController = TextEditingController();
+  String paymentMethod = 'فودافون كاش';
+  double amount = 50.0;
+
+  void _submitBooking() {
+    if (selectedDevice == null || nameController.text.isEmpty || senderInfoController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('من فضلك أكمل جميع البيانات واختار الجهاز')),
+      );
+      return;
+    }
+
+    final notif = BookingNotification(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      customerName: nameController.text,
+      customerSenderInfo: senderInfoController.text,
+      deviceName: selectedDevice!.name,
+      paymentMethod: paymentMethod,
+      amount: amount,
+      isPaid: false,
+    );
+
+    widget.shop.notifications.add(notif);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تم إرسال الطلب بنجاح'),
+        content: Text('تم إرسال طلب حجز ${selectedDevice!.name} إلى صاحب السايبر.\nبرجاء تحويل مبلغ $amount ج.م إلى:\n\n$paymentMethod: ${paymentMethod == 'فودافون كاش' ? widget.shop.vodafoneCash : widget.shop.instapay}'),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text('حسناً'),
+          )
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final availableDevices = widget.shop.devices.where((d) => d.isAvailable).toList();
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1E),
-      appBar: AppBar(
-        backgroundColor: Colors.purple,
-        title: Text("حجز في: ${shop.shopName}", style: const TextStyle(color: Colors.white, fontSize: 16)),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(title: Text('حجز في ${widget.shop.shopName}'), backgroundColor: Colors.blueGrey, foregroundColor: Colors.white),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
           children: [
-            const Text("👤 بيانات الزبون", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
             TextField(
               controller: nameController,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(labelText: "اسمك الثلاثي", labelStyle: TextStyle(color: Colors.grey)),
+              decoration: const InputDecoration(labelText: 'اسمك الكريم', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: senderInfoController,
+              decoration: const InputDecoration(labelText: 'رقم هاتفك أو حساب إنستا باي المحول منه', border: OutlineInputBorder()),
+              keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 20),
-            const Text("🎮 اختر جهازاً متاحاً:", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            shop.devices.isEmpty
-                ? const Text("لا توجد أجهزة مضافة حالياً", style: TextStyle(color: Colors.grey))
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: shop.devices.length,
-                    itemBuilder: (context, index) {
-                      final device = shop.devices[index];
-                      bool isSelected = selectedDevice == device;
-                      return Card(
-                        color: isSelected ? Colors.purple.withOpacity(0.3) : const Color(0xFF1E1E2F),
-                        child: ListTile(
-                          leading: Icon(device.type == "بلايستيشن" ? Icons.sports_esports : Icons.computer, color: device.isAvailable ? Colors.greenAccent : Colors.grey),
-                          title: Text(device.name, style: const TextStyle(color: Colors.white)),
-                          subtitle: Text(device.isAvailable ? "متاح [${device.type}] (السعر: $pricePerHour ج.م/ساعة)" : "مشغول حالياً [${device.type}]", style: TextStyle(color: device.isAvailable ? Colors.greenAccent : Colors.redAccent)),
-                          trailing: device.isAvailable
-                              ? Radio<DeviceModel>(
-                                  value: device,
-                                  groupValue: selectedDevice,
-                                  activeColor: Colors.purpleAccent,
-                                  onChanged: (val) => setState(() => selectedDevice = val),
-                                )
-                              : const Text("محجوز", style: TextStyle(color: Colors.grey)),
-                        ),
+            const Text('اختر الجهاز المتاح:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 10),
+            availableDevices.isEmpty
+                ? const Text('عذراً، لا توجد أجهزة متاحة للحجز حالياً في هذا السايبر.', style: TextStyle(color: Colors.red))
+                : Column(
+                    children: availableDevices.map((device) {
+                      return RadioListTile<DeviceModel>(
+                        title: Text(device.name),
+                        subtitle: Text('النوع: ${device.type}'),
+                        value: device,
+                        groupValue: selectedDevice,
+                        onChanged: (val) {
+                          setState(() {
+                            selectedDevice = val;
+                          });
+                        },
                       );
-                    },
+                    }).toList(),
                   ),
             const SizedBox(height: 20),
-            const Text("💳 طريقة الدفع", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-            DropdownButton<String>(
+            const Text('طريقة الدفع:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            DropdownButtonFormField<String>(
               value: paymentMethod,
-              dropdownColor: const Color(0xFF2E2E42),
-              style: const TextStyle(color: Colors.white),
-              isExpanded: true,
               items: const [
-                DropdownMenuItem(value: "نقدي (كاش)", child: Text("نقدي (كاش في الكاونتر)")),
-                DropdownMenuItem(value: "فودافون كاش", child: Text("فودافون كاش")),
-                DropdownMenuItem(value: "إنستا باي", child: Text("إنستا باي (Instapay)")),
+                DropdownMenuItem(value: 'فودافون كاش', child: Text('فودافون كاش')),
+                DropdownMenuItem(value: 'إنستا باي (InstaPay)', child: Text('إنستا باي (InstaPay)')),
+                DropdownMenuItem(value: 'نقدي (كاش بالمكان)', child: Text('نقدي (كاش بالمكان)')),
               ],
-              onChanged: (val) => setState(() => paymentMethod = val!),
+              onChanged: (val) {
+                if (val != null) setState(() => paymentMethod = val);
+              },
+              decoration: const InputDecoration(border: OutlineInputBorder()),
             ),
-            if (paymentMethod == "فودافون كاش") ...[
-              Text("رقم التحويل للسايبر: ${shop.vodafoneCash}", style: const TextStyle(color: Colors.purpleAccent, fontSize: 12)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: senderInfoController,
-                keyboardType: TextInputType.phone,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(labelText: "رقم هاتفك المحول منه (فودافون كاش)", labelStyle: TextStyle(color: Colors.grey)),
+            const SizedBox(height: 15),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                paymentMethod == 'فودافون كاش'
+                    ? 'رقم فودافون كاش للتحويل: ${widget.shop.vodafoneCash}'
+                    : paymentMethod == 'إنستا باي (InstaPay)'
+                        ? 'عنوان إنستا باي للتحويل: ${widget.shop.instapay}'
+                        : 'يرجى الدفع كاش عند الوصول لمسؤول السايبر.',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
               ),
-            ],
-            if (paymentMethod == "إنستا باي") ...[
-              Text("عنوان التحويل للسايبر: ${shop.instapay}", style: const TextStyle(color: Colors.purpleAccent, fontSize: 12)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: senderInfoController,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(labelText: "اسمك أو حسابك المحول منه (إنستا باي)", labelStyle: TextStyle(color: Colors.grey)),
-              ),
-            ],
+            ),
             const SizedBox(height: 30),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () {
-                if (nameController.text.trim().isEmpty || selectedDevice == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ برجاء إدخال الاسم واختيار جهاز متاح")));
-                  return;
-                }
-
-                if (paymentMethod != "نقدي (كاش)" && senderInfoController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ برجاء إدخال رقم هاتفك أو حسابك المحول منه")));
-                  return;
-                }
-
-                String senderInfo = paymentMethod == "نقدي (كاش)" ? "الدفع عند الكاونتر (كاش)" : senderInfoController.text.trim();
-
-                setState(() {
-                  selectedDevice!.isAvailable = false;
-                  selectedDevice!.currentCustomer = nameController.text.trim();
-                  shop.notifications.add(BookingNotification(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    customerName: nameController.text.trim(),
-                    customerSenderInfo: senderInfo,
-                    deviceName: selectedDevice!.name,
-                    paymentMethod: paymentMethod,
-                    amount: pricePerHour,
-                  ));
-                });
-
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: const Color(0xFF1E1E2F),
-                    title: const Text("✅ تم الحجز بنجاح", style: TextStyle(color: Colors.greenAccent)),
-                    content: Text("تم حجز ${selectedDevice!.name} بنجاح. ${paymentMethod == 'نقدي (كاش)' ? 'يرجى التوجه للكاونتر للدفع نقداً.' : 'تم إرسال رقم التحويل لصاحب السايبر.'}", style: const TextStyle(color: Colors.white)),
-                    actions: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        },
-                        child: const Text("حسناً", style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              child: const Text("تأكيد وحجز الجهاز", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50), backgroundColor: Colors.blueGrey, foregroundColor: Colors.white),
+              onPressed: _submitBooking,
+              child: const Text('تأكيد وإرسال طلب الحجز', style: TextStyle(fontSize: 18)),
             ),
           ],
         ),

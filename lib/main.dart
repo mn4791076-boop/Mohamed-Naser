@@ -8,7 +8,7 @@ void main() {
   ));
 }
 
-// 🔐 كود التفعيل التجاري الخاص بك (لا يمكن لأي صاحب سايبر فتحه إلا به)
+// 🔐 كود التفعيل التجاري الخاص بك
 const String masterActivationCode = "Mohamed 200901281371307";
 
 // نموذج بيانات الجهاز
@@ -16,8 +16,14 @@ class DeviceModel {
   String name;
   String type; // "بلايستيشن" أو "بي سي"
   bool isAvailable;
+  String? currentCustomer;
 
-  DeviceModel({required this.name, required this.type, this.isAvailable = true});
+  DeviceModel({
+    required this.name,
+    required this.type,
+    this.isAvailable = true,
+    this.currentCustomer,
+  });
 }
 
 // نموذج حساب صاحب السايبر
@@ -26,27 +32,50 @@ class ShopAccount {
   String password;
   String shopName;
   String instapay;
+  String vodafoneCash;
   List<DeviceModel> devices;
-  List<String> notifications;
+  List<BookingNotification> notifications;
 
   ShopAccount({
     required this.phone,
     required this.password,
     required this.shopName,
     required this.instapay,
+    required this.vodafoneCash,
     required this.devices,
     required this.notifications,
   });
 }
 
+// نموذج الإشعارات والحجوزات
+class BookingNotification {
+  String id;
+  String customerName;
+  String customerSenderInfo; // رقم التليفون أو حساب إنستا باي للزبون
+  String deviceName;
+  String paymentMethod; // "نقدي (كاش)", "فودافون كاش", "إنستا باي"
+  double amount;
+  bool isPaid;
+
+  BookingNotification({
+    required this.id,
+    required this.customerName,
+    required this.customerSenderInfo,
+    required this.deviceName,
+    required this.paymentMethod,
+    required this.amount,
+    this.isPaid = false,
+  });
+}
+
 class AppData {
-  // المحلات المسجلة في النظام
   static List<ShopAccount> registeredShops = [
     ShopAccount(
       phone: "01000000000",
       password: "123",
       shopName: "سايبر الألعاب المركزي",
       instapay: "cyber.central@instapay",
+      vodafoneCash: "01000000000",
       devices: [
         DeviceModel(name: "PlayStation 5 - 1", type: "بلايستيشن", isAvailable: true),
         DeviceModel(name: "PC Gaming 1", type: "بي سي", isAvailable: true),
@@ -90,12 +119,12 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  "Cyber System التجاري",
+                  "Cyber System الاحترافي",
                   style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  "نظام إدارة محلات الألعاب مع حماية بكود التفعيل",
+                  "إدارة شاملة لمحلات الألعاب والبلايستيشن والـ PC",
                   style: TextStyle(color: Colors.grey, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
@@ -108,15 +137,13 @@ class RoleSelectionScreen extends StatelessWidget {
                     minimumSize: const Size(double.infinity, 55),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  onPressed: () {
-                    _showOwnerAuthModal(context);
-                  },
+                  onPressed: () => _showOwnerAuthModal(context),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.admin_panel_settings, color: Colors.white),
                       SizedBox(width: 10),
-                      Text("دخول / تفعيل حساب صاحب السايبر", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                      Text("دخول / تسجيل صاحب السايبر", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -129,9 +156,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     side: const BorderSide(color: Colors.purpleAccent, width: 2),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  onPressed: () {
-                    _showCustomerSelectShopDialog(context);
-                  },
+                  onPressed: () => _showCustomerSelectShopDialog(context),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -149,7 +174,6 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 
-  // نافذة مصادقة وتفعيل صاحب السايبر
   void _showOwnerAuthModal(BuildContext context) {
     final TextEditingController phoneController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
@@ -164,8 +188,8 @@ class RoleSelectionScreen extends StatelessWidget {
           backgroundColor: const Color(0xFF1E1E2F),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
-            isRegistering ? "🔑 تفعيل وإنشاء حساب جديد" : "🔐 تسجيل دخول صاحب السايبر",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+            isRegistering ? "🔑 تفعيل وإنشاء حساب سايبر جديد" : "🔐 تسجيل دخول صاحب السايبر",
+            style: const TextStyle(color: Colors.white, fontSize: 16),
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -175,21 +199,13 @@ class RoleSelectionScreen extends StatelessWidget {
                   TextField(
                     controller: shopNameController,
                     style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      labelText: "اسم السايبر الخاص بك",
-                      labelStyle: TextStyle(color: Colors.grey),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.purple)),
-                    ),
+                    decoration: const InputDecoration(labelText: "اسم السايبر", labelStyle: TextStyle(color: Colors.grey)),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: activationController,
                     style: const TextStyle(color: Colors.greenAccent),
-                    decoration: const InputDecoration(
-                      labelText: "كود تفعيل البرنامج (المشترى منك)",
-                      labelStyle: TextStyle(color: Colors.grey),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.green)),
-                    ),
+                    decoration: const InputDecoration(labelText: "كود التفعيل التجاري", labelStyle: TextStyle(color: Colors.grey)),
                   ),
                   const SizedBox(height: 10),
                 ],
@@ -197,32 +213,20 @@ class RoleSelectionScreen extends StatelessWidget {
                   controller: phoneController,
                   keyboardType: TextInputType.phone,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: "رقم التليفون الشخصي",
-                    labelStyle: TextStyle(color: Colors.grey),
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.purple)),
-                  ),
+                  decoration: const InputDecoration(labelText: "رقم التليفون", labelStyle: TextStyle(color: Colors.grey)),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: passwordController,
                   obscureText: true,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: "كلمة السر",
-                    labelStyle: TextStyle(color: Colors.grey),
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.purple)),
-                  ),
+                  decoration: const InputDecoration(labelText: "كلمة السر", labelStyle: TextStyle(color: Colors.grey)),
                 ),
                 const SizedBox(height: 15),
                 TextButton(
-                  onPressed: () {
-                    setStateModal(() {
-                      isRegistering = !isRegistering;
-                    });
-                  },
+                  onPressed: () => setStateModal(() => isRegistering = !isRegistering),
                   child: Text(
-                    isRegistering ? "لديك حساب بالفعل؟ سجل دخول" : "مشترٍ جديد؟ فعّل حسابك الآن",
+                    isRegistering ? "لديك حساب؟ سجل دخول" : "مشترٍ جديد؟ فعّل حسابك الآن",
                     style: const TextStyle(color: Colors.purpleAccent, fontSize: 13),
                   ),
                 ),
@@ -241,9 +245,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 String pass = passwordController.text.trim();
 
                 if (phone.isEmpty || pass.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("❌ برجاء إدخال رقم التليفون وكلمة السر")),
-                  );
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ برجاء إدخال البيانات كاملة")));
                   return;
                 }
 
@@ -251,26 +253,18 @@ class RoleSelectionScreen extends StatelessWidget {
                   String shopName = shopNameController.text.trim();
                   String actCode = activationController.text.trim();
 
-                  if (shopName.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("❌ برجاء إدخال اسم السايبر")),
-                    );
+                  if (shopName.isEmpty || actCode.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ برجاء إدخال اسم السايبر وكود التفعيل")));
                     return;
                   }
 
-                  // 🛑 الشرط الأمني: التحقق من كود التفعيل الخاص بك
                   if (actCode != masterActivationCode) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("❌ كود التفعيل غير صحيح! تواصل مع المطور لشراء الكود.")),
-                    );
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ كود التفعيل غير صحيح!")));
                     return;
                   }
 
-                  bool exists = AppData.registeredShops.any((shop) => shop.phone == phone);
-                  if (exists) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("⚠️ هذا الرقم مسجل مسبقاً، قم بتسجيل الدخول")),
-                    );
+                  if (AppData.registeredShops.any((s) => s.phone == phone)) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("⚠️ هذا الرقم مسجل مسبقاً")));
                     return;
                   }
 
@@ -279,6 +273,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     password: pass,
                     shopName: shopName,
                     instapay: "$phone@instapay",
+                    vodafoneCash: phone,
                     devices: [
                       DeviceModel(name: "PlayStation - 1", type: "بلايستيشن", isAvailable: true),
                     ],
@@ -287,25 +282,15 @@ class RoleSelectionScreen extends StatelessWidget {
                   AppData.registeredShops.add(newShop);
                   AppData.currentOwnerShop = newShop;
                   Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const OwnerDashboardScreen()),
-                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const OwnerDashboardScreen()));
                 } else {
                   try {
-                    ShopAccount foundShop = AppData.registeredShops.firstWhere(
-                      (shop) => shop.phone == phone && shop.password == pass,
-                    );
-                    AppData.currentOwnerShop = foundShop;
+                    ShopAccount found = AppData.registeredShops.firstWhere((s) => s.phone == phone && s.password == pass);
+                    AppData.currentOwnerShop = found;
                     Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const OwnerDashboardScreen()),
-                    );
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const OwnerDashboardScreen()));
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("❌ رقم التليفون أو كلمة السر غير صحيحة!")),
-                    );
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ بيانات الدخول غير صحيحة")));
                   }
                 }
               },
@@ -317,7 +302,6 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 
-  // نافذة اختيار السايبر للزبون
   void _showCustomerSelectShopDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -341,10 +325,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   onTap: () {
                     AppData.currentOwnerShop = shop;
                     Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CustomerBookingScreen()),
-                    );
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerBookingScreen()));
                   },
                 ),
               );
@@ -367,7 +348,7 @@ class OwnerDashboardScreen extends StatefulWidget {
 class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
   late ShopAccount owner = AppData.currentOwnerShop!;
   late TextEditingController shopNameController = TextEditingController(text: owner.shopName);
-  late TextEditingController phoneController = TextEditingController(text: owner.phone);
+  late TextEditingController phoneController = TextEditingController(text: owner.vodafoneCash);
   late TextEditingController instapayController = TextEditingController(text: owner.instapay);
 
   @override
@@ -376,7 +357,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
       backgroundColor: const Color(0xFF0F0F1E),
       appBar: AppBar(
         backgroundColor: Colors.purple,
-        title: Text("إدارة: ${owner.shopName}", style: const TextStyle(color: Colors.white, fontSize: 16)),
+        title: Text("لوحة تحكم: ${owner.shopName}", style: const TextStyle(color: Colors.white, fontSize: 16)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
@@ -384,6 +365,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // إعدادات السايبر
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -394,35 +376,21 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("⚙️ إعدادات السايبر وحسابات التحصيل", style: TextStyle(color: Colors.purpleAccent, fontSize: 15, fontWeight: FontWeight.bold)),
+                  const Text("⚙️ إعدادات السايبر وطرق التحصيل", style: TextStyle(color: Colors.purpleAccent, fontSize: 15, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-                  TextField(
-                    controller: shopNameController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: "اسم السايبر", labelStyle: TextStyle(color: Colors.grey)),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: phoneController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: "رقم فودافون كاش", labelStyle: TextStyle(color: Colors.grey)),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: instapayController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(labelText: "حساب إنستا باي", labelStyle: TextStyle(color: Colors.grey)),
-                  ),
+                  TextField(controller: shopNameController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "اسم السايبر")),
+                  TextField(controller: phoneController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "فودافون كاش")),
+                  TextField(controller: instapayController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "إنستا باي")),
                   const SizedBox(height: 15),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, minimumSize: const Size(double.infinity, 42)),
                     onPressed: () {
                       setState(() {
                         owner.shopName = shopNameController.text;
-                        owner.phone = phoneController.text;
+                        owner.vodafoneCash = phoneController.text;
                         owner.instapay = instapayController.text;
                       });
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ تم الحفظ بنجاح")));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ تم حفظ الإعدادات بنجاح")));
                     },
                     child: const Text("حفظ الإعدادات", style: TextStyle(color: Colors.white)),
                   ),
@@ -430,25 +398,50 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text("🔔 تنبيهات الحجوزات وإيصالات الدفع", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            // إشعارات الحجوزات وتأكيد الدفع
+            const Text("🔔 الحجوزات والمدفوعات الواردة", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Container(
-              height: 120,
+              height: 180,
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(color: const Color(0xFF1E1E2F), borderRadius: BorderRadius.circular(16)),
               child: owner.notifications.isEmpty
-                  ? const Center(child: Text("لا توجد تنبيهات جديدة", style: TextStyle(color: Colors.grey)))
+                  ? const Center(child: Text("لا توجد حجوزات جديدة", style: TextStyle(color: Colors.grey)))
                   : ListView.builder(
                       itemCount: owner.notifications.length,
                       itemBuilder: (context, index) {
-                        return ListTile(
-                          leading: const Icon(Icons.receipt_long, color: Colors.greenAccent),
-                          title: Text(owner.notifications[index], style: const TextStyle(color: Colors.white, fontSize: 13)),
+                        final notif = owner.notifications[index];
+                        return Card(
+                          color: const Color(0xFF2E2E42),
+                          child: ListTile(
+                            title: Text("${notif.customerName} - ${notif.deviceName}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("الطريقة: ${notif.paymentMethod} | القيمة: ${notif.amount} ج.م", style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                                Text("رقم/حساب التحويل: ${notif.customerSenderInfo}", style: const TextStyle(color: Colors.greenAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            trailing: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: notif.isPaid ? Colors.green : Colors.orange,
+                                minimumSize: const Size(70, 30),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  notif.isPaid = true;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ تم تأكيد الدفع بنجاح")));
+                              },
+                              child: Text(notif.isPaid ? "تم الدفع" : "تأكيد الدفع", style: const TextStyle(color: Colors.white, fontSize: 11)),
+                            ),
+                          ),
                         );
                       },
                     ),
             ),
             const SizedBox(height: 20),
+            // إدارة الأجهزة
             Row(
               mainAxisAlignment: MainAxisAlignment.between,
               children: [
@@ -477,16 +470,26 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
                       color: device.isAvailable ? Colors.greenAccent : Colors.redAccent,
                     ),
                     title: Text(device.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    subtitle: Text("النوع: ${device.type}", style: const TextStyle(color: Colors.grey)),
+                    subtitle: Text(
+                      device.isAvailable ? "متاح للحجز ✅ (${device.type})" : "مشغول الآن بـ (${device.currentCustomer ?? 'زبون'}) [${device.type}]",
+                      style: TextStyle(color: device.isAvailable ? Colors.greenAccent : Colors.orangeAccent),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          device.isAvailable ? "متاح 🟢" : "مشغول 🔴",
-                          style: TextStyle(color: device.isAvailable ? Colors.greenAccent : Colors.redAccent, fontWeight: FontWeight.bold),
-                        ),
+                        if (!device.isAvailable)
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                device.isAvailable = true;
+                                device.currentCustomer = null;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("🔄 تم تفريغ الجهاز وأصبح متاحاً تلقائياً")));
+                            },
+                            child: const Text("تفريغ", style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                          ),
                         IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.grey),
+                          icon: const Icon(Icons.delete, color: Colors.redAccent),
                           onPressed: () {
                             setState(() {
                               owner.devices.removeAt(index);
@@ -511,48 +514,43 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2F),
-        title: const Text("إضافة جهاز جديد", style: TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                hintText: "اسم الجهاز (مثل: PS 4)",
-                hintStyle: TextStyle(color: Colors.grey),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateModal) => AlertDialog(
+          backgroundColor: const Color(0xFF1E1E2F),
+          title: const Text("➕ إضافة جهاز جديد", style: TextStyle(color: Colors.white)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: nameController, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "اسم الجهاز (مثال: PS5 - 2 أو PC - 2)")),
+              const SizedBox(height: 10),
+              DropdownButton<String>(
+                value: type,
+                dropdownColor: const Color(0xFF2E2E42),
+                style: const TextStyle(color: Colors.white),
+                items: const [
+                  DropdownMenuItem(value: "بلايستيشن", child: Text("بلايستيشن")),
+                  DropdownMenuItem(value: "بي سي", child: Text("بي سي (PC)")),
+                ],
+                onChanged: (val) => setStateModal(() => type = val!),
               ),
-            ),
-            const SizedBox(height: 15),
-            DropdownButtonFormField<String>(
-              value: type,
-              dropdownColor: const Color(0xFF1E1E2F),
-              style: const TextStyle(color: Colors.white),
-              items: ["بلايستيشن", "بي سي"].map((val) => DropdownMenuItem(value: val, child: Text(val))).toList(),
-              onChanged: (val) => type = val!,
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text("إلغاء", style: TextStyle(color: Colors.grey))),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+              onPressed: () {
+                if (nameController.text.isNotEmpty) {
+                  setState(() {
+                    owner.devices.add(DeviceModel(name: nameController.text.trim(), type: type, isAvailable: true));
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text("إضافة", style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("إلغاء", style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-            onPressed: () {
-              if (nameController.text.isNotEmpty) {
-                setState(() {
-                  owner.devices.add(DeviceModel(name: nameController.text, type: type, isAvailable: true));
-                });
-                Navigator.pop(context);
-              }
-            },
-            child: const Text("إضافة", style: TextStyle(color: Colors.white)),
-          ),
-        ],
       ),
     );
   }
@@ -567,11 +565,12 @@ class CustomerBookingScreen extends StatefulWidget {
 }
 
 class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
-  late ShopAccount shop = AppData.currentOwnerShop!;
+  final ShopAccount shop = AppData.currentOwnerShop!;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController senderInfoController = TextEditingController();
   DeviceModel? selectedDevice;
-  double selectedHours = 1;
-  String selectedPayment = "نقدي (كاش)";
-  bool hasAttachedReceipt = false;
+  String paymentMethod = "نقدي (كاش)";
+  double pricePerHour = 40.0;
 
   @override
   Widget build(BuildContext context) {
@@ -579,141 +578,137 @@ class _CustomerBookingScreenState extends State<CustomerBookingScreen> {
       backgroundColor: const Color(0xFF0F0F1E),
       appBar: AppBar(
         backgroundColor: Colors.purple,
-        title: Text(shop.shopName, style: const TextStyle(color: Colors.white)),
+        title: Text("حجز في: ${shop.shopName}", style: const TextStyle(color: Colors.white, fontSize: 16)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("🎮 الحجز في: ${shop.shopName}", style: const TextStyle(color: Colors.purpleAccent, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 15),
-            const Text("اختر جهازاً للحجز:", style: TextStyle(color: Colors.white, fontSize: 15)),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 170,
-              child: ListView.builder(
-                itemCount: shop.devices.length,
-                itemBuilder: (context, index) {
-                  final device = shop.devices[index];
-                  bool isSelected = selectedDevice == device;
-                  return Card(
-                    color: isSelected ? Colors.purple.withOpacity(0.4) : const Color(0xFF1E1E2F),
-                    child: ListTile(
-                      leading: Icon(
-                        device.type == "بلايستيشن" ? Icons.sports_esports : Icons.computer,
-                        color: device.isAvailable ? Colors.greenAccent : Colors.redAccent,
-                      ),
-                      title: Text(device.name, style: const TextStyle(color: Colors.white)),
-                      subtitle: Text("النوع: ${device.type}", style: const TextStyle(color: Colors.grey)),
-                      trailing: Text(
-                        device.isAvailable ? "متاح 🟢" : "مشغول 🔴",
-                        style: TextStyle(color: device.isAvailable ? Colors.greenAccent : Colors.redAccent, fontWeight: FontWeight.bold),
-                      ),
-                      onTap: device.isAvailable
-                          ? () => setState(() => selectedDevice = device)
-                          : null,
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 15),
-            Text("⏳ عدد الساعات: ${selectedHours.toInt()}", style: const TextStyle(color: Colors.white)),
-            Slider(
-              value: selectedHours,
-              min: 1,
-              max: 10,
-              divisions: 9,
-              activeColor: Colors.purple,
-              onChanged: (val) => setState(() => selectedHours = val),
-            ),
-            const SizedBox(height: 10),
-            const Text("💳 طريقة الدفع:", style: TextStyle(color: Colors.white, fontSize: 15)),
-            const SizedBox(height: 5),
-            DropdownButtonFormField<String>(
-              value: selectedPayment,
-              dropdownColor: const Color(0xFF1E1E2F),
+            const Text("👤 بيانات الزبون", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: nameController,
               style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFF1E1E2F),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              items: [
-                "نقدي (كاش في المحل)",
-                "فودافون كاش (${shop.phone})",
-                "إنستا باي (${shop.instapay})"
-              ].map((val) => DropdownMenuItem(value: val, child: Text(val))).toList(),
-              onChanged: (val) => setState(() => selectedPayment = val!),
+              decoration: const InputDecoration(labelText: "اسمك الثلاثي", labelStyle: TextStyle(color: Colors.grey)),
             ),
-            if (!selectedPayment.contains("نقدي")) ...[
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: hasAttachedReceipt ? Colors.green : Colors.deepPurple,
-                  minimumSize: const Size(double.infinity, 45),
-                ),
-                onPressed: () {
-                  setState(() => hasAttachedReceipt = true);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("📸 تم التقاط وإرفاق إيصال التحويل بنجاح!")),
-                  );
-                },
-                icon: Icon(hasAttachedReceipt ? Icons.check_circle : Icons.camera_alt),
-                label: Text(hasAttachedReceipt ? "تم إرفاق إيصال التحويل 📷" : "تصوير / رفع إيصال التحويل 📸"),
+            const SizedBox(height: 20),
+            const Text("🎮 اختر جهازاً متاحاً:", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            shop.devices.isEmpty
+                ? const Text("لا توجد أجهزة مضافة حالياً", style: TextStyle(color: Colors.grey))
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: shop.devices.length,
+                    itemBuilder: (context, index) {
+                      final device = shop.devices[index];
+                      bool isSelected = selectedDevice == device;
+                      return Card(
+                        color: isSelected ? Colors.purple.withOpacity(0.3) : const Color(0xFF1E1E2F),
+                        child: ListTile(
+                          leading: Icon(device.type == "بلايستيشن" ? Icons.sports_esports : Icons.computer, color: device.isAvailable ? Colors.greenAccent : Colors.grey),
+                          title: Text(device.name, style: const TextStyle(color: Colors.white)),
+                          subtitle: Text(device.isAvailable ? "متاح [${device.type}] (السعر: $pricePerHour ج.م/ساعة)" : "مشغول حالياً [${device.type}]", style: TextStyle(color: device.isAvailable ? Colors.greenAccent : Colors.redAccent)),
+                          trailing: device.isAvailable
+                              ? Radio<DeviceModel>(
+                                  value: device,
+                                  groupValue: selectedDevice,
+                                  activeColor: Colors.purpleAccent,
+                                  onChanged: (val) => setState(() => selectedDevice = val),
+                                )
+                              : const Text("محجوز", style: TextStyle(color: Colors.grey)),
+                        ),
+                      );
+                    },
+                  ),
+            const SizedBox(height: 20),
+            const Text("💳 طريقة الدفع", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+            DropdownButton<String>(
+              value: paymentMethod,
+              dropdownColor: const Color(0xFF2E2E42),
+              style: const TextStyle(color: Colors.white),
+              isExpanded: true,
+              items: const [
+                DropdownMenuItem(value: "نقدي (كاش)", child: Text("نقدي (كاش في الكاونتر)")),
+                DropdownMenuItem(value: "فودافون كاش", child: Text("فودافون كاش")),
+                DropdownMenuItem(value: "إنستا باي", child: Text("إنستا باي (Instapay)")),
+              ],
+              onChanged: (val) => setState(() => paymentMethod = val!),
+            ),
+            if (paymentMethod == "فودافون كاش") ...[
+              Text("رقم التحويل للسايبر: ${shop.vodafoneCash}", style: const TextStyle(color: Colors.purpleAccent, fontSize: 12)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: senderInfoController,
+                keyboardType: TextInputType.phone,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(labelText: "رقم هاتفك المحول منه (فودافون كاش)", labelStyle: TextStyle(color: Colors.grey)),
               ),
             ],
-            const SizedBox(height: 25),
+            if (paymentMethod == "إنستا باي") ...[
+              Text("عنوان التحويل للسايبر: ${shop.instapay}", style: const TextStyle(color: Colors.purpleAccent, fontSize: 12)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: senderInfoController,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(labelText: "اسمك أو حسابك المحول منه (إنستا باي)", labelStyle: TextStyle(color: Colors.grey)),
+              ),
+            ],
+            const SizedBox(height: 30),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              onPressed: selectedDevice == null
-                  ? null
-                  : () {
-                      if (!selectedPayment.contains("نقدي") && !hasAttachedReceipt) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("⚠️ برجاء إرفاق الإيصال أولاً")),
-                        );
-                        return;
-                      }
+              onPressed: () {
+                if (nameController.text.trim().isEmpty || selectedDevice == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ برجاء إدخال الاسم واختيار جهاز متاح")));
+                  return;
+                }
 
-                      setState(() {
-                        selectedDevice!.isAvailable = false;
-                      });
+                if (paymentMethod != "نقدي (كاش)" && senderInfoController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❌ برجاء إدخال رقم هاتفك أو حسابك المحول منه")));
+                  return;
+                }
 
-                      shop.notifications.insert(
-                        0,
-                        "حجز جديد: (${selectedDevice!.name}) لمدة ${selectedHours.toInt()} ساعات | الدفع: $selectedPayment",
-                      );
+                String senderInfo = paymentMethod == "نقدي (كاش)" ? "الدفع عند الكاونتر (كاش)" : senderInfoController.text.trim();
 
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          backgroundColor: const Color(0xFF1E1E2F),
-                          title: const Text("🎉 تم الحجز بنجاح!", style: TextStyle(color: Colors.white)),
-                          content: Text(
-                            "تم حجز الجهاز بنجاح في ${shop.shopName}",
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          actions: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                              child: const Text("حسناً", style: TextStyle(color: Colors.white)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-              child: const Text("تأكيد الحجز الآن", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                setState(() {
+                  selectedDevice!.isAvailable = false;
+                  selectedDevice!.currentCustomer = nameController.text.trim();
+                  shop.notifications.add(BookingNotification(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    customerName: nameController.text.trim(),
+                    customerSenderInfo: senderInfo,
+                    deviceName: selectedDevice!.name,
+                    paymentMethod: paymentMethod,
+                    amount: pricePerHour,
+                  ));
+                });
+
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: const Color(0xFF1E1E2F),
+                    title: const Text("✅ تم الحجز بنجاح", style: TextStyle(color: Colors.greenAccent)),
+                    content: Text("تم حجز ${selectedDevice!.name} بنجاح. ${paymentMethod == 'نقدي (كاش)' ? 'يرجى التوجه للكاونتر للدفع نقداً.' : 'تم إرسال رقم التحويل لصاحب السايبر.'}", style: const TextStyle(color: Colors.white)),
+                    actions: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                        child: const Text("حسناً", style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: const Text("تأكيد وحجز الجهاز", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
